@@ -13,7 +13,6 @@ edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, np.ones((5,5), np.uint8))
 contours = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 biggest = max(contours, key=cv2.contourArea)
 
-
 hull = cv2.convexHull(biggest)
 epsilon = 0.02 * cv2.arcLength(hull, True)
 approx = cv2.approxPolyDP(hull, epsilon, True)
@@ -48,6 +47,25 @@ pts2 = np.array([[0,0], [x_length-1,0], [x_length-1,y_length-1], [0,y_length-1]]
 M = cv2.getPerspectiveTransform(pts1, pts2)
 warped = cv2.warpPerspective(img, M, (int(x_length), int(y_length)))
 
-# ===================================
+#===================================
+# Grayscale'e çevir (zaten grayscale ise bu adımı atlayabilirsiniz)
+gray = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
+# Piksel değeri 125'in üzerinde olanları beyaz, altındakileri siyah yap
+_, binary = cv2.threshold(gray, 125, 255, cv2.THRESH_BINARY)
+
+binary = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
+#====================================
+
+
+
+cv2.imwrite("scanned_adjusted.jpg", binary)
 cv2.imwrite("scanned.jpg", warped)
+
+plt.subplot(1,3,1)
+plt.imshow(img)
+plt.subplot(1,3,2)
+plt.imshow(warped)
+plt.subplot(1,3,3)
+plt.imshow(binary)
+plt.show()
